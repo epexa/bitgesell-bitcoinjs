@@ -1,0 +1,30 @@
+{
+  "name": "bitgesell-bitcoinjs",
+  "version": "1.0.0",
+  "description": "Bitgesell BitcoinJS",
+  "homepage": "https://bglwallet.io",
+  "keywords": [
+    "bitgesell",
+    "networks",
+    "bitcoinjs",
+    "bitcoinjs-lib",
+    "bip32",
+    "bip39",
+    "ecpair",
+    "tiny-secp256k1",
+    "blockchain"
+  ],
+  "bugs": "https://github.com/epexa/bitgesell-bitcoinjs/issues",
+  "author": "epexa",
+  "repository": "epexa/bitgesell-bitcoinjs",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "bip32": "^5.0.0-rc.0",
+    "bip39": "^3.1.0",
+    "bitcoinjs-lib": "^6.1.7",
+    "bitgesell-networks": "^1.0.0",
+    "ecpair": "^3.0.0",
+    "tiny-secp256k1": "^2.2.3"
+  }
+}
