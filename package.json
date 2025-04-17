@@ -1,6 +1,6 @@
 {
   "name": "bitgesell-bitcoinjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Bitgesell BitcoinJS",
   "homepage": "https://bglwallet.io",
   "keywords": [
@@ -11,7 +11,7 @@
     "bip32",
     "bip39",
     "ecpair",
-    "@bitcoinerlab/secp256k1",
+    "secp256k1",
     "blockchain"
   ],
   "bugs": "https://github.com/epexa/bitgesell-bitcoinjs/issues",

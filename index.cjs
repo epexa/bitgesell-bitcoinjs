@@ -18,7 +18,7 @@ _export(exports, {
 });
 var _bitcoinjslib = require("bitcoinjs-lib");
 var _bitgesellnetworks = require("bitgesell-networks");
-var _psbtutils = require("./node_modules/bitcoinjs-lib/src/psbt/psbtutils.js");
+var _psbtutils = require("bitcoinjs-lib/src/psbt/psbtutils.js");
 var _jssha3 = /*#__PURE__*/ _interop_require_default(require("js-sha3"));
 var _varuintbitcoin = require("varuint-bitcoin");
 function _array_like_to_array(arr, len) {

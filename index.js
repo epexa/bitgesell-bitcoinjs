@@ -1,6 +1,6 @@
 import { Psbt, payments, script } from 'bitcoinjs-lib';
 import { BITGESELL_MAINNET } from 'bitgesell-networks';
-import { witnessStackToScriptWitness } from './node_modules/bitcoinjs-lib/src/psbt/psbtutils.js';
+import { witnessStackToScriptWitness } from 'bitcoinjs-lib/src/psbt/psbtutils.js';
 import sha from 'js-sha3';
 import { encode as varuintEncode } from 'varuint-bitcoin';
 
