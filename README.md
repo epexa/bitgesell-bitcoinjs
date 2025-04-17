@@ -6,7 +6,7 @@
 
 ### This repository provides [Bitgesell blockchain](https://bitgesell.ca) support for the BitcoinJS library.
 
-## No need to fork or modify `bitcoinjs-lib` — just install and use this [bitgesell-bitcoinjs](https://www.npmjs.com/package/bitgesell-bitcoinjs) package!
+#### No need to fork or modify `bitcoinjs-lib` — just install and use this [bitgesell-bitcoinjs](https://www.npmjs.com/package/bitgesell-bitcoinjs) package!
 
 ## 📦 Requirements
 - Node.js >= 14

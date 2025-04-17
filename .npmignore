@@ -1,0 +1,4 @@
+.gitignore
+.husky/
+eslint.config.js
+logo.png
