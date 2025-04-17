@@ -11,7 +11,7 @@
     "bip32",
     "bip39",
     "ecpair",
-    "tiny-secp256k1",
+    "@bitcoinerlab/secp256k1",
     "blockchain"
   ],
   "bugs": "https://github.com/epexa/bitgesell-bitcoinjs/issues",
@@ -19,12 +19,33 @@
   "repository": "epexa/bitgesell-bitcoinjs",
   "license": "MIT",
   "type": "module",
+  "main": "index.js",
+  "exports": {
+    "import": "./index.js",
+    "require": "./index.cjs"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "eslint": "eslint",
+    "build": "npm run eslint && swc index.js -C module.type=commonjs -o index.cjs"
+  },
+  "workspaces": [
+    "examples"
+  ],
+  "peerDependencies": {
+    "bitcoinjs-lib": "^6.1.7"
+  },
   "dependencies": {
-    "bip32": "^5.0.0-rc.0",
-    "bip39": "^3.1.0",
-    "bitcoinjs-lib": "^6.1.7",
     "bitgesell-networks": "^1.0.0",
-    "ecpair": "^3.0.0",
-    "tiny-secp256k1": "^2.2.3"
+    "js-sha3": "^0.9.3",
+    "varuint-bitcoin": "^2.0.0"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.7.2",
+    "@swc/core": "^1.11.21",
+    "eslint": "^9.24.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-n": "^17.17.0",
+    "husky": "^9.1.7"
   }
 }
