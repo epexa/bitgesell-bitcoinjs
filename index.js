@@ -1,10 +1,8 @@
 import { Psbt, payments, script } from 'bitcoinjs-lib';
 import { BITGESELL_MAINNET } from 'bitgesell-networks';
 import { witnessStackToScriptWitness } from 'bitcoinjs-lib/src/psbt/psbtutils.js';
-import sha from 'js-sha3';
+import { keccak_256 as keccak256 } from '@noble/hashes/sha3';
 import { encode as varuintEncode } from 'varuint-bitcoin';
-
-const { keccak256 } = sha;
 
 const toLE8 = (v) => {
 	const buf = Buffer.alloc(8);
@@ -49,14 +47,14 @@ const getPreimage = ({ version, vIn, vOut, locktime, inputIdx, scriptCode, value
 
 	return Buffer.concat([
 		versionBuf,
-		Buffer.from(keccak256.arrayBuffer(prevouts)),
-		Buffer.from(keccak256.arrayBuffer(sequence)),
+		Buffer.from(keccak256(prevouts)),
+		Buffer.from(keccak256(sequence)),
 		outpoint,
 		scriptCodeLen,
 		scriptCode,
 		valBuf,
 		seqBuf,
-		Buffer.from(keccak256.arrayBuffer(outputs)),
+		Buffer.from(keccak256(outputs)),
 		locktimeBuf,
 		sighashTypeBuf,
 	]);
@@ -90,7 +88,7 @@ const patchPsbt = () => {
 			value: vIn[inputIdx].value,
 			sighashType,
 		});
-		const sighash = Buffer.from(keccak256.arrayBuffer(preimage));
+		const sighash = Buffer.from(keccak256(preimage));
 		const sigDER = script.signature.encode(Buffer.from(keyPair.sign(sighash)), sighashType);
 		input.partialSig = [ { signature: sigDER, pubkey: pubkeyBuf } ];
 		input.__bglSigDER = sigDER;

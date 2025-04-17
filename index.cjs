@@ -19,7 +19,7 @@ _export(exports, {
 var _bitcoinjslib = require("bitcoinjs-lib");
 var _bitgesellnetworks = require("bitgesell-networks");
 var _psbtutils = require("bitcoinjs-lib/src/psbt/psbtutils.js");
-var _jssha3 = /*#__PURE__*/ _interop_require_default(require("js-sha3"));
+var _sha3 = require("@noble/hashes/sha3");
 var _varuintbitcoin = require("varuint-bitcoin");
 function _array_like_to_array(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
@@ -28,11 +28,6 @@ function _array_like_to_array(arr, len) {
 }
 function _array_without_holes(arr) {
     if (Array.isArray(arr)) return _array_like_to_array(arr);
-}
-function _interop_require_default(obj) {
-    return obj && obj.__esModule ? obj : {
-        default: obj
-    };
 }
 function _iterable_to_array(iter) {
     if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
@@ -51,7 +46,6 @@ function _unsupported_iterable_to_array(o, minLen) {
     if (n === "Map" || n === "Set") return Array.from(n);
     if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
 }
-var keccak256 = _jssha3.default.keccak256;
 var toLE8 = function(v) {
     var buf = Buffer.alloc(8);
     buf.writeUInt32LE(v >>> 0, 0);
@@ -103,14 +97,14 @@ var getPreimage = function(param) {
     sighashTypeBuf.writeUInt32LE(sighashType, 0);
     return Buffer.concat([
         versionBuf,
-        Buffer.from(keccak256.arrayBuffer(prevouts)),
-        Buffer.from(keccak256.arrayBuffer(sequence)),
+        Buffer.from((0, _sha3.keccak_256)(prevouts)),
+        Buffer.from((0, _sha3.keccak_256)(sequence)),
         outpoint,
         scriptCodeLen,
         scriptCode,
         valBuf,
         seqBuf,
-        Buffer.from(keccak256.arrayBuffer(outputs)),
+        Buffer.from((0, _sha3.keccak_256)(outputs)),
         locktimeBuf,
         sighashTypeBuf
     ]);
@@ -153,7 +147,7 @@ var patchPsbt = function() {
             value: vIn[inputIdx].value,
             sighashType: sighashType
         });
-        var sighash = Buffer.from(keccak256.arrayBuffer(preimage));
+        var sighash = Buffer.from((0, _sha3.keccak_256)(preimage));
         var sigDER = _bitcoinjslib.script.signature.encode(Buffer.from(keyPair.sign(sighash)), sighashType);
         input.partialSig = [
             {
