@@ -1,8 +1,8 @@
 import { Psbt, payments, script } from 'bitcoinjs-lib';
-import { BITGESELL_MAINNET } from 'bitgesell-networks';
 import { witnessStackToScriptWitness } from 'bitcoinjs-lib/src/psbt/psbtutils.js';
 import { keccak_256 as keccak256 } from '@noble/hashes/sha3';
 import { encode as varuintEncode } from 'varuint-bitcoin';
+import { BITGESELL_MAINNET } from 'bitgesell-networks';
 
 const toLE8 = (v) => {
 	const buf = Buffer.alloc(8);
@@ -84,7 +84,7 @@ const patchPsbt = () => {
 			vOut,
 			locktime: tx.locktime,
 			inputIdx,
-			scriptCode: payments.p2pkh({ pubkey: pubkeyBuf, network: BITGESELL_MAINNET }).output,
+			scriptCode: payments.p2pkh({ pubkey: pubkeyBuf }).output,
 			value: vIn[inputIdx].value,
 			sighashType,
 		});
