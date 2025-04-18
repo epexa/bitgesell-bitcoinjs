@@ -1,1 +1,8 @@
-npm run eslint
+npm run build
+
+if ! git diff --quiet -- index.cjs; then
+	echo "❗ index.cjs changed after build"
+	echo "🧹 Staging the fresh file and asking to amend the commit..."
+	git add -u index.cjs
+	exit 1
+fi
