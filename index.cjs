@@ -17,84 +17,51 @@ _export(exports, {
     }
 });
 var _bitcoinjslib = require("bitcoinjs-lib");
-var _bitgesellnetworks = require("bitgesell-networks");
 var _psbtutils = require("bitcoinjs-lib/src/psbt/psbtutils.js");
 var _sha3 = require("@noble/hashes/sha3");
 var _varuintbitcoin = require("varuint-bitcoin");
-function _array_like_to_array(arr, len) {
-    if (len == null || len > arr.length) len = arr.length;
-    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
-    return arr2;
-}
-function _array_without_holes(arr) {
-    if (Array.isArray(arr)) return _array_like_to_array(arr);
-}
-function _iterable_to_array(iter) {
-    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
-}
-function _non_iterable_spread() {
-    throw new TypeError("Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-function _to_consumable_array(arr) {
-    return _array_without_holes(arr) || _iterable_to_array(arr) || _unsupported_iterable_to_array(arr) || _non_iterable_spread();
-}
-function _unsupported_iterable_to_array(o, minLen) {
-    if (!o) return;
-    if (typeof o === "string") return _array_like_to_array(o, minLen);
-    var n = Object.prototype.toString.call(o).slice(8, -1);
-    if (n === "Object" && o.constructor) n = o.constructor.name;
-    if (n === "Map" || n === "Set") return Array.from(n);
-    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
-}
-var toLE8 = function(v) {
-    var buf = Buffer.alloc(8);
-    buf.writeUInt32LE(v >>> 0, 0);
+var _bitgesellnetworks = require("bitgesell-networks");
+var toLE = function(number) {
+    var size = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : 4;
+    var buf = Buffer.alloc(size);
+    buf.writeUInt32LE(number, 0);
     return buf;
 };
 var getPreimage = function(param) {
     var version = param.version, vIn = param.vIn, vOut = param.vOut, locktime = param.locktime, inputIdx = param.inputIdx, scriptCode = param.scriptCode, value = param.value, sighashType = param.sighashType;
-    var versionBuf = Buffer.alloc(4);
-    versionBuf.writeUInt32LE(version, 0);
-    var prevouts = Buffer.concat(vIn.map(function(input) {
-        var hash = Buffer.from(input.txid, 'hex').reverse();
-        var voutBuf = Buffer.alloc(4);
-        voutBuf.writeUInt32LE(input.vout, 0);
+    var versionBuf = toLE(version);
+    var prevouts = Buffer.concat(vIn.map(function(param) {
+        var txid = param.txid, vout = param.vout;
+        var hash = Buffer.from(txid, 'hex').reverse();
         return Buffer.concat([
             hash,
-            voutBuf
+            toLE(vout)
         ]);
     }));
-    var sequence = Buffer.concat(vIn.map(function(input) {
-        var seqBuf = Buffer.alloc(4);
-        seqBuf.writeUInt32LE(input.sequence, 0);
-        return seqBuf;
+    var sequence = Buffer.concat(vIn.map(function(param) {
+        var sequence = param.sequence;
+        return toLE(sequence);
     }));
     var input = vIn[inputIdx];
     var outpoint = Buffer.concat([
         Buffer.from(input.txid, 'hex').reverse(),
-        function() {
-            var b = Buffer.alloc(4);
-            b.writeUInt32LE(input.vout, 0);
-            return b;
-        }()
+        toLE(input.vout)
     ]);
     var scriptCodeLen = Buffer.from([
         scriptCode.length
     ]);
-    var valBuf = toLE8(value);
-    var seqBuf = Buffer.alloc(4);
-    seqBuf.writeUInt32LE(input.sequence, 0);
-    var outputs = Buffer.concat(vOut.map(function(out) {
-        var script = out.script;
+    var valBuf = toLE(value, 8);
+    var seqBuf = toLE(input.sequence);
+    var outputs = Buffer.concat(vOut.map(function(param) {
+        var value = param.value, script = param.script;
         return Buffer.concat([
-            toLE8(out.value),
+            toLE(value, 8),
             Buffer.from((0, _varuintbitcoin.encode)(script.length).buffer),
             script
         ]);
     }));
-    var locktimeBuf = Buffer.alloc(4);
-    var sighashTypeBuf = Buffer.alloc(4);
-    sighashTypeBuf.writeUInt32LE(sighashType, 0);
+    var locktimeBuf = toLE(locktime, 4);
+    var sighashTypeBuf = toLE(sighashType, 4);
     return Buffer.concat([
         versionBuf,
         Buffer.from((0, _sha3.keccak_256)(prevouts)),
@@ -141,8 +108,7 @@ var patchPsbt = function() {
             locktime: tx.locktime,
             inputIdx: inputIdx,
             scriptCode: _bitcoinjslib.payments.p2pkh({
-                pubkey: pubkeyBuf,
-                network: _bitgesellnetworks.BITGESELL_MAINNET
+                pubkey: pubkeyBuf
             }).output,
             value: vIn[inputIdx].value,
             sighashType: sighashType
@@ -159,24 +125,16 @@ var patchPsbt = function() {
         input.__bglPubkey = pubkeyBuf;
         return this;
     };
-    var origFinalizeInput = _bitcoinjslib.Psbt.prototype.finalizeInput;
     _bitcoinjslib.Psbt.prototype.finalizeInput = function(inputIndex) {
         for(var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++){
             args[_key - 1] = arguments[_key];
         }
-        var _origFinalizeInput;
         var input = this.data.inputs[inputIndex];
-        if (input.__bglSigDER && input.__bglPubkey) {
-            input.finalScriptWitness = (0, _psbtutils.witnessStackToScriptWitness)([
-                input.__bglSigDER,
-                input.__bglPubkey
-            ]);
-            return this;
-        }
-        return (_origFinalizeInput = origFinalizeInput).call.apply(_origFinalizeInput, [
-            this,
-            inputIndex
-        ].concat(_to_consumable_array(args)));
+        input.finalScriptWitness = (0, _psbtutils.witnessStackToScriptWitness)([
+            input.__bglSigDER,
+            input.__bglPubkey
+        ]);
+        return this;
     };
     _bitcoinjslib.Psbt.prototype.__psbtPatched = true;
 };
