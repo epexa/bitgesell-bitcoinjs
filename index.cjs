@@ -24,7 +24,8 @@ var _bitgesellnetworks = require("bitgesell-networks");
 var toLE = function(number) {
     var size = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : 4;
     var buf = Buffer.alloc(size);
-    buf.writeUInt32LE(number, 0);
+    if (size === 8) buf.writeBigUInt64LE(BigInt(number), 0);
+    else buf.writeUInt32LE(number, 0);
     return buf;
 };
 var getPreimage = function(param) {

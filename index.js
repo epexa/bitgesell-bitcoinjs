@@ -7,7 +7,8 @@ import { BITGESELL_MAINNET } from 'bitgesell-networks';
 const toLE = (number, size = 4) => {
 	const buf = Buffer.alloc(size);
 
-	buf.writeUInt32LE(number, 0);
+	if (size === 8) buf.writeBigUInt64LE(BigInt(number), 0);
+	else buf.writeUInt32LE(number, 0);
 
 	return buf;
 };
